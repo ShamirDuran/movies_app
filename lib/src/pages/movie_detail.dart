@@ -1,31 +1,42 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:movies_app/src/models/actors.model.dart';
 import 'package:movies_app/src/models/movie_model.dart';
 import 'package:movies_app/src/providers/actors.provider.dart';
+import 'package:movies_app/src/providers/movies_provider.dart';
 
 class MovieDetail extends StatelessWidget {
+  final moviesProvider = MoviesProvider();
+
   @override
   Widget build(BuildContext context) {
     final Movie movie = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // appbar
-          _crearAppBar(movie),
-          // content
-          SliverList(
-            delegate: SliverChildListDelegate([
-              SizedBox(height: 10.0),
-              _posterMovie(context, movie),
-              _description(movie),
-              _description(movie),
-              _description(movie),
-              _description(movie),
-              _createCasting(movie),
-            ]),
-          ),
-        ],
+      body: FutureBuilder(
+        future: moviesProvider.getDetailsMovie(movie),
+        builder: (BuildContext context, AsyncSnapshot<Movie> snapshot) {
+          if (snapshot.hasData) {
+            return CustomScrollView(
+              slivers: [
+                // appbar
+                _crearAppBar(movie),
+                // content
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    SizedBox(height: 10.0),
+                    _posterMovie(context, movie),
+                    _genres(movie),
+                    _description(movie, context),
+                    _createCasting(movie),
+                  ]),
+                ),
+              ],
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
@@ -44,10 +55,6 @@ class MovieDetail extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
         collapseMode: CollapseMode.parallax,
-        title: Text(
-          movie.title,
-          style: TextStyle(color: Colors.white, fontSize: 16.0),
-        ),
         background: FadeInImage(
           image: NetworkImage(movie.getBackgroundImg()),
           placeholder: AssetImage("assets/img/loading.gif"),
@@ -63,6 +70,7 @@ class MovieDetail extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Hero(
             tag: movie.uniqueId,
@@ -80,23 +88,41 @@ class MovieDetail extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  movie.title,
-                  style: Theme.of(context).textTheme.headline6,
+                Text(movie.title, style: Theme.of(context).textTheme.headline5),
+                SizedBox(height: 7.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.av_timer),
+                    SizedBox(width: 7.0),
+                    Text(movie.getRuntime()),
+                  ],
                 ),
-                SizedBox(height: 5.0),
-                Text(movie.releaseDate,
-                    style: Theme.of(context).textTheme.subtitle1,
-                    overflow: TextOverflow.ellipsis),
-                SizedBox(height: 10.0),
+                SizedBox(height: 4.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.date_range),
+                    SizedBox(width: 7.0),
+                    Text(movie.releaseDate),
+                  ],
+                ),
+                SizedBox(height: 4.0),
                 Row(
                   children: [
-                    Icon(Icons.star, color: Colors.yellowAccent),
-                    SizedBox(width: 5.0),
+                    Icon(Icons.star, color: Colors.amber[200]),
+                    SizedBox(width: 7.0),
                     Text("${movie.voteAverage.toString()}/10",
-                        style: Theme.of(context).textTheme.subtitle1),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ],
-                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30.0),
+                  child: Text(
+                    "${movie.voteCount} votos",
+                    style: TextStyle(fontSize: 13.0),
+                  ),
+                ),
               ],
             ),
           ),
@@ -105,19 +131,34 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
+  // Movie genders
+  Widget _genres(Movie movie) {
+    return Padding(
+      padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 8.0),
+      child: Wrap(children: movie.genres.map((e) => inputChip(e)).toList()),
+    );
+  }
+
   // Movie description section
-  Widget _description(Movie movie) {
+  Widget _description(Movie movie, BuildContext context) {
     return Container(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
-      child: Text(movie.overview, textAlign: TextAlign.justify),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Descripción", style: Theme.of(context).textTheme.headline6),
+          SizedBox(height: 8.0),
+          Text(movie.overview, textAlign: TextAlign.justify),
+        ],
+      ),
     );
   }
 
   // Create actosrcasting section builder
   Widget _createCasting(Movie movie) {
-    final actorprovider = ActorsProvider();
+    final actorProvider = ActorsProvider();
     return FutureBuilder(
-      future: actorprovider.getCastMovie(movie),
+      future: actorProvider.getCastMovie(movie),
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasData) {
           return _createActorsPageView(snapshot.data, context);
@@ -180,14 +221,26 @@ class MovieDetail extends StatelessWidget {
             actor.name,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w700),
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 5.0),
+          SizedBox(height: 2.0),
           Text(
             actor.character,
             textAlign: TextAlign.center,
           )
         ],
+      ),
+    );
+  }
+
+  Widget inputChip(String text) {
+    return Container(
+      margin: EdgeInsets.only(right: 6.0),
+      child: InputChip(
+        isEnabled: false,
+        onPressed: () {},
+        label: Text(text),
+        labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
       ),
     );
   }

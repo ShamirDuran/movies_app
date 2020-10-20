@@ -44,6 +44,30 @@ class MoviesProvider {
   }
 
   // obtener peliculas en cine
+  Future<Movie> getDetailsMovie(Movie movie) async {
+    final url = Uri.https(_url, "3/movie/${movie.id}", {
+      'api_key': _apiKey,
+      'language': _language,
+    });
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final decodedData = json.decode(response.body);
+      movie.runtime = decodedData["runtime"];
+      movie.genres.clear();
+      List<dynamic> genres = decodedData["genres"];
+      genres.forEach((element) {
+        movie.genres.add(element["name"]);
+      });
+
+      return movie;
+    } else {
+      print("Null request to $url");
+      return null;
+    }
+  }
+
+  // obtener peliculas en cine
   Future<List<Movie>> getNowPlaying() async {
     final url = Uri.https(_url, "3/movie/now_playing", {
       'api_key': _apiKey,

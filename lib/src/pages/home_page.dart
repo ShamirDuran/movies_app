@@ -27,9 +27,9 @@ class HomePage extends StatelessWidget {
         child: Container(
           child: Column(
             children: [
-              _swiperTarjetas(),
+              _swiperCards(),
               SizedBox(height: 20.0),
-              _footer(context),
+              _popular(context),
             ],
           ),
         ),
@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
   }
 
   // carousel now playing movies
-  Widget _swiperTarjetas() {
+  Widget _swiperCards() {
     return FutureBuilder(
       future: moviesProvider.getNowPlaying(),
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
@@ -56,7 +56,7 @@ class HomePage extends StatelessWidget {
   }
 
   // populares section
-  Widget _footer(BuildContext context) {
+  Widget _popular(BuildContext context) {
     // Se puede agregar acá o en el widget padre
     moviesProvider.getPopular();
 

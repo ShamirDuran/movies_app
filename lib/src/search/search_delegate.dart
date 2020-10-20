@@ -7,6 +7,9 @@ class DataSearch extends SearchDelegate {
   final moviesProvider = MoviesProvider();
   final movies = [];
 
+  final _listController = ScrollController();
+  final Function nextPage = () {};
+
   @override
   List<Widget> buildActions(BuildContext context) {
     // Las acciones de nuestro AppBar
@@ -89,7 +92,15 @@ class DataSearch extends SearchDelegate {
   }
 
   Widget _listResults(BuildContext context) {
+    _listController.addListener(() {
+      if (_listController.position.pixels >=
+          _listController.position.maxScrollExtent - 200) {
+        nextPage();
+      }
+    });
+
     return ListView(
+      controller: _listController,
       children: movies.map((movie) {
         return ListTile(
           leading: ClipRRect(
@@ -104,7 +115,6 @@ class DataSearch extends SearchDelegate {
           title: Text(movie.title),
           subtitle: Text(movie.releaseDate ?? ""),
           onTap: () {
-            close(context, null);
             Navigator.pushNamed(context, "detail", arguments: movie);
           },
         );

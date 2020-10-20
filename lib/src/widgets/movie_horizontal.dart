@@ -70,31 +70,4 @@ class MovieHorizontal extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, "detail", arguments: movie),
     );
   }
-
-  List<Widget> _cards(BuildContext context) {
-    return movies.map((movie) {
-      return Container(
-        margin: EdgeInsets.only(right: 15.0),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: FadeInImage(
-                image: NetworkImage(movie.getPosterImg()),
-                placeholder: AssetImage("assets/img/no-image.jpg"),
-                fit: BoxFit.cover,
-                height: 150.0,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              movie.title,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.caption,
-            )
-          ],
-        ),
-      );
-    }).toList();
-  }
 }
