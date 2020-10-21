@@ -14,8 +14,6 @@ class MovieHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _screenSize = MediaQuery.of(context).size;
-
     _pageController.addListener(() {
       if (_pageController.position.pixels >=
           _pageController.position.maxScrollExtent - 200) {
@@ -24,8 +22,9 @@ class MovieHorizontal extends StatelessWidget {
     });
 
     return Container(
-      height: _screenSize.height * 0.3,
+      height: 180.0,
       child: PageView.builder(
+        physics: BouncingScrollPhysics(),
         // pageSnapping hace que se enfoque una tarjeta
         pageSnapping: false,
         controller: _pageController,
@@ -36,8 +35,6 @@ class MovieHorizontal extends StatelessWidget {
   }
 
   Widget _card(BuildContext context, Movie movie) {
-    movie.uniqueId = '${movie.id}-poster';
-
     final card = Container(
       margin: EdgeInsets.only(right: 15.0),
       child: Column(
@@ -56,11 +53,7 @@ class MovieHorizontal extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.0),
-          Text(
-            movie.title,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.caption,
-          )
+          Text(movie.title, overflow: TextOverflow.ellipsis)
         ],
       ),
     );

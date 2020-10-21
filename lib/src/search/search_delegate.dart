@@ -11,6 +11,15 @@ class DataSearch extends SearchDelegate {
   final Function nextPage = () {};
 
   @override
+  void close(BuildContext context, result) {
+    _listController.dispose();
+    super.close(context, result);
+  }
+
+  @override
+  String get searchFieldLabel => "Buscar película";
+
+  @override
   List<Widget> buildActions(BuildContext context) {
     // Las acciones de nuestro AppBar
     return [
@@ -49,30 +58,6 @@ class DataSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    // Son las sugerencias que aparecen cuando la persona escribe
-
-    // ************* CODIGO DE EJEMPLO LOCAL ********************
-
-    // final listaSugerida = (query.isEmpty)
-    //     ? moviesRecents
-    //     : movies.where((p) => p.toLowerCase().startsWith(query)).toList();
-
-    // return ListView.builder(
-    //   itemCount: listaSugerida.length,
-    //   itemBuilder: (BuildContext context, int index) {
-    //     return ListTile(
-    //       leading: Icon(Icons.movie),
-    //       title: Text(listaSugerida[index]),
-    //       onTap: () {
-    //         selected = listaSugerida[index];
-    //         showResults(context);
-    //       },
-    //     );
-    //   },
-    // );
-
-    // ************* CODIGO USANDO API **************
-
     if (query.isEmpty) return Container();
 
     return FutureBuilder(

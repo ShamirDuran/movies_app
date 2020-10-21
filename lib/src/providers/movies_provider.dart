@@ -8,9 +8,8 @@ class MoviesProvider {
   String _url = "api.themoviedb.org";
   String _language = "es-ES";
 
-  int _popularesPage = 0;
   bool _loading = false;
-
+  int _popularPage = 0;
   List<Movie> _popular = List();
 
   /// El broadcast permite que tenga varios lugares escuchando.
@@ -59,7 +58,6 @@ class MoviesProvider {
       genres.forEach((element) {
         movie.genres.add(element["name"]);
       });
-
       return movie;
     } else {
       print("Null request to $url");
@@ -73,7 +71,10 @@ class MoviesProvider {
       'api_key': _apiKey,
       'language': _language,
     });
-    return await _processResponse(url);
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-playing");
+
+    return resp;
   }
 
   // obtener peliculas de acuerdo a la busqueda
@@ -83,7 +84,10 @@ class MoviesProvider {
       'language': _language,
       'query': query,
     });
-    return await _processResponse(url);
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-search");
+
+    return resp;
   }
 
   // obtener peliculas populares
@@ -91,17 +95,18 @@ class MoviesProvider {
     // Esto hace que no se ejecute varias veces el mismo codigo mientras este la bandera levantada
     if (_loading) return [];
     _loading = true;
-    _popularesPage++;
+    _popularPage++;
 
-    // print("Cargando siguientes...pag: $_popularesPage");
+    print("call getPopular");
 
     final url = Uri.https(_url, "3/movie/popular", {
       'api_key': _apiKey,
       'language': _language,
-      'page': _popularesPage.toString(),
+      'page': _popularPage.toString(),
     });
 
-    final resp = await _processResponse(url);
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-popular");
 
     _popular.addAll(resp);
     // Se agrega la lista de peliculas al stream
@@ -109,6 +114,19 @@ class MoviesProvider {
 
     // Se quita la bandera de loading
     _loading = false;
+    return resp;
+  }
+
+  // obtener peliculas populares
+  Future<List<Movie>> getSimilar(Movie movie) async {
+    final url = Uri.https(_url, "3/movie/${movie.id}/similar", {
+      'api_key': _apiKey,
+      'language': _language,
+    });
+
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-similar");
+
     return resp;
   }
 }

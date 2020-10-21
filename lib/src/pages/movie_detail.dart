@@ -4,6 +4,7 @@ import 'package:movies_app/src/models/actors.model.dart';
 import 'package:movies_app/src/models/movie_model.dart';
 import 'package:movies_app/src/providers/actors.provider.dart';
 import 'package:movies_app/src/providers/movies_provider.dart';
+import 'package:movies_app/src/widgets/movie_horizontal.dart';
 
 class MovieDetail extends StatelessWidget {
   final moviesProvider = MoviesProvider();
@@ -29,6 +30,7 @@ class MovieDetail extends StatelessWidget {
                     _genres(movie),
                     _description(movie, context),
                     _createCasting(movie),
+                    _createSimilar(movie),
                   ]),
                 ),
               ],
@@ -164,8 +166,10 @@ class MovieDetail extends StatelessWidget {
           return _createActorsPageView(snapshot.data, context);
         } else {
           return Container(
-            padding: EdgeInsets.only(top: 30.0),
-            child: Center(child: CircularProgressIndicator()),
+            padding: EdgeInsets.only(top: 30.0, bottom: 15.0),
+            child: Container(
+                margin: EdgeInsets.all(50.0),
+                child: Center(child: CircularProgressIndicator())),
           );
         }
       },
@@ -175,25 +179,29 @@ class MovieDetail extends StatelessWidget {
   // Create actor casting section
   Widget _createActorsPageView(List<Actor> actors, BuildContext context) {
     if (actors.isNotEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-              padding: EdgeInsets.only(
-                  left: 20.0, right: 20.0, top: 20.0, bottom: 8.0),
-              child: Text("Actores",
-                  style: Theme.of(context).textTheme.headline6)),
-          SizedBox(
-            height: 240.0,
-            child: PageView.builder(
-              pageSnapping: false,
-              controller: PageController(initialPage: 1, viewportFraction: 0.3),
-              itemCount: actors.length,
-              itemBuilder: (context, index) =>
-                  _actorCard(actors[index], context),
+      return Container(
+        margin: EdgeInsets.only(bottom: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+                padding: EdgeInsets.only(
+                    left: 20.0, right: 20.0, top: 20.0, bottom: 8.0),
+                child: Text("Actores",
+                    style: Theme.of(context).textTheme.headline6)),
+            SizedBox(
+              height: 180.0,
+              child: PageView.builder(
+                pageSnapping: false,
+                controller:
+                    PageController(initialPage: 1, viewportFraction: 0.3),
+                itemCount: actors.length,
+                itemBuilder: (context, index) =>
+                    _actorCard(actors[index], context),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     } else {
       return Container();
@@ -203,6 +211,7 @@ class MovieDetail extends StatelessWidget {
   // Create actor card
   Widget _actorCard(Actor actor, BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(right: 15.0),
       child: Column(
         children: [
           ClipRRect(
@@ -221,15 +230,51 @@ class MovieDetail extends StatelessWidget {
             actor.name,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 2.0),
-          Text(
-            actor.character,
-            textAlign: TextAlign.center,
-          )
         ],
       ),
+    );
+  }
+
+  Widget _createSimilar(Movie movie) {
+    return FutureBuilder(
+      future: moviesProvider.getSimilar(movie),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<Movie> similar = snapshot.data;
+          if (similar.isNotEmpty)
+            return Container(
+              margin: EdgeInsets.only(bottom: 15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 20.0, right: 20.0, bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("Películas similares",
+                            style: Theme.of(context).textTheme.headline6),
+                        SizedBox(width: 5.0),
+                        Expanded(
+                            child: Divider(
+                          color: Colors.black,
+                        )),
+                      ],
+                    ),
+                  ),
+                  MovieHorizontal(movies: similar, nextPage: () {}),
+                ],
+              ),
+            );
+          else
+            return Container();
+        } else
+          return Container(
+              margin: EdgeInsets.all(100.0),
+              child: Center(child: CircularProgressIndicator()));
+      },
     );
   }
 

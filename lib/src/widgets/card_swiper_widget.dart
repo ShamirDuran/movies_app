@@ -12,12 +12,10 @@ class CardSwiper extends StatelessWidget {
     final _screenSize = MediaQuery.of(context).size;
 
     return Container(
-      // usa todo el ancho disponible
       padding: EdgeInsets.only(top: 20.0),
       child: Swiper(
         itemBuilder: (BuildContext context, int index) {
           // Se genera un tag unico para evitar errores entre los hero
-          movies[index].uniqueId = '${movies[index].id}-card';
           return Hero(
             tag: movies[index].uniqueId,
             child: ClipRRect(

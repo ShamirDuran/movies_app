@@ -7,33 +7,78 @@ import 'package:movies_app/src/widgets/movie_horizontal.dart';
 class HomePage extends StatelessWidget {
   final moviesProvider = MoviesProvider();
 
+  final tabs = [
+    "Inicio",
+    "Populares",
+    "Mejor valoradas",
+    "Genero",
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text("Peliculas en cine"),
-        backgroundColor: Colors.indigoAccent,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(context: context, delegate: DataSearch());
-            },
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.indigoAccent,
+          title: Text("Movie app",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () =>
+                    showSearch(context: context, delegate: DataSearch())),
+          ],
+          bottom: TabBar(
+            isScrollable: true,
+            tabs: [
+              for (final tab in tabs) Tab(text: tab),
+            ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: Container(
-          child: Column(
+        ),
+        // body: SafeArea(
+        //   child: Container(
+        //     child: ListView(
+        //       children: [
+        //         _swiperCards(),
+        //         SizedBox(height: 20.0),
+        //         _popular(context),
+        //         SizedBox(height: 20.0),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        body: SafeArea(
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             children: [
-              _swiperCards(),
-              SizedBox(height: 20.0),
-              _popular(context),
+              _homeSection(context),
+              Center(
+                child: Text("Estamos en popu"),
+              ),
+              Center(
+                child: Text("Estamos en mejor"),
+              ),
+              Center(
+                child: Text("Estamos en cate"),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _homeSection(BuildContext context) {
+    return ListView(
+      children: [
+        _swiperCards(),
+        SizedBox(height: 20.0),
+        _popular(context),
+        SizedBox(height: 20.0),
+      ],
     );
   }
 
@@ -44,7 +89,17 @@ class HomePage extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasData) {
           // snapshot.data es la lista de peliculas
-          return CardSwiper(movies: snapshot.data);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 20.0),
+                child: Text("Cartelera",
+                    style: Theme.of(context).textTheme.headline5),
+              ),
+              CardSwiper(movies: snapshot.data),
+            ],
+          );
         } else {
           return Container(
             height: MediaQuery.of(context).size.height * 0.5,
@@ -66,9 +121,9 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-              padding: EdgeInsets.only(left: 20.0),
+              padding: EdgeInsets.only(left: 20.0, top: 25.0),
               child: Text("Populares",
-                  style: Theme.of(context).textTheme.subtitle1)),
+                  style: Theme.of(context).textTheme.headline5)),
           SizedBox(height: 10.0),
           StreamBuilder(
             stream: moviesProvider.popularStream,
@@ -77,6 +132,7 @@ class HomePage extends StatelessWidget {
                 return MovieHorizontal(
                     movies: snapshot.data, nextPage: moviesProvider.getPopular);
               } else {
+                moviesProvider.getPopular();
                 return Container(
                     child: Center(child: CircularProgressIndicator()));
               }
