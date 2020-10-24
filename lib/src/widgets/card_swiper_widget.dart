@@ -9,35 +9,40 @@ class CardSwiper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _screenSize = MediaQuery.of(context).size;
+    return _swiperStack(context);
+  }
 
+  Widget _swiperStack(BuildContext context) {
+    final _screenSize = MediaQuery.of(context).size;
     return Container(
-      padding: EdgeInsets.only(top: 20.0),
+      padding: EdgeInsets.only(top: 15.0),
       child: Swiper(
+        itemCount: movies.length,
+        itemWidth: _screenSize.width * 0.55,
+        itemHeight: _screenSize.height * 0.45,
+        layout: SwiperLayout.STACK,
         itemBuilder: (BuildContext context, int index) {
           // Se genera un tag unico para evitar errores entre los hero
-          return Hero(
-            tag: movies[index].uniqueId,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              // Aplica el efecto de on tap a las card
-              child: GestureDetector(
-                onTap: () => Navigator.pushNamed(context, "detail",
-                    arguments: movies[index]),
-                child: FadeInImage(
-                  image: NetworkImage(movies[index].getPosterImg()),
-                  placeholder: AssetImage("assets/img/no-image.jpg"),
-                  fadeInDuration: Duration(milliseconds: 400),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          );
+          return _gridSwiper(movies[index], context);
         },
-        itemCount: movies.length,
-        itemWidth: _screenSize.width * 0.50,
-        itemHeight: _screenSize.height * 0.43,
-        layout: SwiperLayout.STACK,
+      ),
+    );
+  }
+
+  Widget _gridSwiper(Movie movie, BuildContext context) {
+    return Hero(
+      tag: movie.uniqueId,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15.0),
+        child: GestureDetector(
+          onTap: () => Navigator.pushNamed(context, "detail", arguments: movie),
+          child: FadeInImage(
+            image: NetworkImage(movie.getPosterImg()),
+            placeholder: AssetImage("assets/img/no-image.jpg"),
+            fadeInDuration: Duration(milliseconds: 400),
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }

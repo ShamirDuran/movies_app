@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:movies_app/src/models/actors.model.dart';
+import 'package:movies_app/src/models/actors_model.dart';
 import 'package:movies_app/src/models/movie_model.dart';
-import 'package:movies_app/src/providers/actors.provider.dart';
+import 'package:movies_app/src/providers/actors_provider.dart';
 import 'package:movies_app/src/providers/movies_provider.dart';
 import 'package:movies_app/src/widgets/movie_horizontal.dart';
 
@@ -77,7 +77,7 @@ class MovieDetail extends StatelessWidget {
           Hero(
             tag: movie.uniqueId,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(15.0),
               child: Image(
                 image: NetworkImage(movie.getPosterImg()),
                 height: 150.0,
@@ -215,7 +215,7 @@ class MovieDetail extends StatelessWidget {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(15.0),
             child: FadeInImage(
               image: NetworkImage(actor.getPhoto(), scale: 1.0),
               placeholder: AssetImage("assets/img/no-image.jpg"),
@@ -248,21 +248,13 @@ class MovieDetail extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Divider(color: Colors.black),
+                  SizedBox(height: 20.0),
                   Padding(
                     padding:
                         EdgeInsets.only(left: 20.0, right: 20.0, bottom: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text("Películas similares",
-                            style: Theme.of(context).textTheme.headline6),
-                        SizedBox(width: 5.0),
-                        Expanded(
-                            child: Divider(
-                          color: Colors.black,
-                        )),
-                      ],
-                    ),
+                    child: Text("Películas similares",
+                        style: Theme.of(context).textTheme.headline6),
                   ),
                   MovieHorizontal(movies: similar, nextPage: () {}),
                 ],

@@ -1,9 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movies_app/src/pages/home_page.dart';
 import 'package:movies_app/src/pages/movie_detail.dart';
+import 'package:movies_app/src/pages/tab_nav.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -21,12 +20,15 @@ class MyApp extends StatelessWidget {
         fontFamily: "ProximaNovaRegular",
         textTheme: TextTheme(
           headline5: TextStyle(
-            fontFamily: "ProximaNovaBold",
-            fontSize: 23.0,
+            fontFamily: "ProximaNobaBold",
+            fontSize: 21.0,
           ),
           headline6: TextStyle(
             fontFamily: "ProximaNovaRegular",
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
+          ),
+          subtitle2: TextStyle(
+            fontFamily: "ProximaNobaRegular",
           ),
         ),
       ),
@@ -34,7 +36,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        "/": (BuildContext context) => HomePage(),
+        "/": (BuildContext context) => TabNav(),
         "detail": (BuildContext context) => MovieDetail(),
       },
     );

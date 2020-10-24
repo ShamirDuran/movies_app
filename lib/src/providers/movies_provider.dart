@@ -12,6 +12,14 @@ class MoviesProvider {
   int _popularPage = 0;
   List<Movie> _popular = List();
 
+  bool _loadingTop = false;
+  int _topRatedPage = 0;
+  List<Movie> _topRated = List();
+
+  bool _loadingGenre = false;
+  int _genrePage = 0;
+  List<Movie> _genre = List();
+
   /// El broadcast permite que tenga varios lugares escuchando.
   /// Esto seria la representación de una tuberia
   final _popularStreamController = StreamController<List<Movie>>.broadcast();
@@ -26,6 +34,20 @@ class MoviesProvider {
   /// Cierra la tuberia, Stream.
   void disposeStreams() {
     _popularStreamController?.close();
+  }
+
+  final _topRatedController = StreamController<List<Movie>>.broadcast();
+  Function(List<Movie>) get topRatedSink => _topRatedController.sink.add;
+  Stream<List<Movie>> get topRatedStream => _topRatedController.stream;
+  void disposeTopRatedStrem() {
+    _topRatedController?.close();
+  }
+
+  final _genreStreamController = StreamController<List<Movie>>.broadcast();
+  Function(List<Movie>) get genreSink => _genreStreamController.sink.add;
+  Stream<List<Movie>> get genreStream => _genreStreamController.stream;
+  void disposeGenreStream() {
+    _genreStreamController?.close();
   }
 
   // hacer la peticion a la api mediante la urñ
@@ -110,10 +132,55 @@ class MoviesProvider {
 
     _popular.addAll(resp);
     // Se agrega la lista de peliculas al stream
-    popularSink(_popular);
+    if (!_popularStreamController.isClosed) popularSink(_popular);
 
     // Se quita la bandera de loading
     _loading = false;
+    return resp;
+  }
+
+  Future<List<Movie>> getTopRated() async {
+    if (_loadingTop) return [];
+    _loadingTop = true;
+    _topRatedPage++;
+
+    print("call getTopRated");
+
+    final url = Uri.https(_url, "3/movie/top_rated", {
+      'api_key': _apiKey,
+      'language': _language,
+      'page': _topRatedPage.toString(),
+    });
+
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-top");
+    _topRated.addAll(resp);
+    if (!_topRatedController.isClosed) topRatedSink(_topRated);
+    _loadingTop = false;
+    return resp;
+  }
+
+  Future<List<Movie>> getMoviesWithGenre(String genreId) async {
+    if (_loadingGenre) return [];
+    _loadingGenre = true;
+    _genrePage++;
+
+    print("call getMoviesWithGenre");
+
+    final url = Uri.https(_url, "3/discover/movie", {
+      'api_key': _apiKey,
+      'language': _language,
+      'include_adult': "true",
+      'include_video': "false",
+      'page': _genrePage.toString(),
+      'with_genres': genreId,
+    });
+
+    List<Movie> resp = await _processResponse(url);
+    resp.forEach((movie) => movie.uniqueId = "${movie.id}-genre");
+    _genre.addAll(resp);
+    if (!_genreStreamController.isClosed) genreSink(_genre);
+    _loadingGenre = false;
     return resp;
   }
 

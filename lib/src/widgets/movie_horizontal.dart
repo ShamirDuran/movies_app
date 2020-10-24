@@ -43,7 +43,7 @@ class MovieHorizontal extends StatelessWidget {
             // enlaza en ambas vistas el widget
             tag: movie.uniqueId,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(15.0),
               child: FadeInImage(
                 image: NetworkImage(movie.getPosterImg()),
                 placeholder: AssetImage("assets/img/no-image.jpg"),
@@ -52,7 +52,7 @@ class MovieHorizontal extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10.0),
+          SizedBox(height: 5.0),
           Text(movie.title, overflow: TextOverflow.ellipsis)
         ],
       ),

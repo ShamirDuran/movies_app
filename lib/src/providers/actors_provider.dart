@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:movies_app/src/models/actors.model.dart';
+import 'package:movies_app/src/models/actors_model.dart';
 import 'package:movies_app/src/models/movie_model.dart';
 
 class ActorsProvider {
