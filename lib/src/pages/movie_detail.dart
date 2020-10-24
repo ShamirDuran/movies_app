@@ -90,7 +90,7 @@ class MovieDetail extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(movie.title, style: Theme.of(context).textTheme.headline5),
+                Text(movie.title, style: Theme.of(context).textTheme.headline6),
                 SizedBox(height: 7.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
