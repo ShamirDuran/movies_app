@@ -7,29 +7,58 @@ class MovieHorizontal extends StatelessWidget {
 
   MovieHorizontal({@required this.movies, @required this.nextPage});
 
-  final _pageController = PageController(
-    initialPage: 1,
-    viewportFraction: 0.3,
-  );
-
   @override
   Widget build(BuildContext context) {
+    final _dimen = MediaQuery.of(context).size;
+    double _viewPort = 0.3;
+    int _initialPage = 1;
+
+    if (_dimen.width >= 425 && _dimen.width <= 600) {
+      _viewPort = 0.25;
+      _initialPage = 2;
+    } else if (_dimen.width > 600) {
+      _viewPort = 0.2;
+      _initialPage = 2;
+    }
+
+    // final _pageController = PageController(
+    //   initialPage: 1,
+    //   // viewportFraction: 0.3,
+    //   viewportFraction: _viewPort,
+    // );
+
+    // return Container(
+    //   height: 180.0,
+    //   child: PageView.builder(
+    //     physics: BouncingScrollPhysics(),
+    //     // pageSnapping hace que se enfoque una tarjeta
+    //     pageSnapping: false,
+    //     controller: _pageController,
+    //     itemCount: movies.length,
+    //     itemBuilder: (context, index) => _card(context, movies[index]),
+    //   ),
+    // );
+
+    final _pageController = ScrollController();
+
     _pageController.addListener(() {
       if (_pageController.position.pixels >=
           _pageController.position.maxScrollExtent - 200) {
         nextPage();
       }
+      print("scroll off");
     });
 
     return Container(
-      height: 180.0,
-      child: PageView.builder(
+      height: 190.0,
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: ListView.builder(
         physics: BouncingScrollPhysics(),
-        // pageSnapping hace que se enfoque una tarjeta
-        pageSnapping: false,
+        scrollDirection: Axis.horizontal,
         controller: _pageController,
         itemCount: movies.length,
-        itemBuilder: (context, index) => _card(context, movies[index]),
+        itemBuilder: (BuildContext context, int index) =>
+            _card(context, movies[index]),
       ),
     );
   }
@@ -43,17 +72,27 @@ class MovieHorizontal extends StatelessWidget {
             // enlaza en ambas vistas el widget
             tag: movie.uniqueId,
             child: ClipRRect(
+              clipBehavior: Clip.antiAlias,
               borderRadius: BorderRadius.circular(15.0),
               child: FadeInImage(
                 image: NetworkImage(movie.getPosterImg()),
                 placeholder: AssetImage("assets/img/no-image.jpg"),
+                fadeInDuration: Duration(milliseconds: 200),
                 fit: BoxFit.cover,
                 height: 150.0,
               ),
             ),
           ),
           SizedBox(height: 5.0),
-          Text(movie.title, overflow: TextOverflow.ellipsis)
+          SizedBox(
+            width: 100.0,
+            child: Text(
+              movie.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          )
         ],
       ),
     );

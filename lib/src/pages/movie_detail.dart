@@ -6,8 +6,25 @@ import 'package:movies_app/src/providers/actors_provider.dart';
 import 'package:movies_app/src/providers/movies_provider.dart';
 import 'package:movies_app/src/widgets/movie_horizontal.dart';
 
-class MovieDetail extends StatelessWidget {
-  final moviesProvider = MoviesProvider();
+class MovieDetail extends StatefulWidget {
+  @override
+  _MovieDetailState createState() => _MovieDetailState();
+}
+
+class _MovieDetailState extends State<MovieDetail> {
+  MoviesProvider _moviesProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _moviesProvider = MoviesProvider();
+  }
+
+  @override
+  void dispose() {
+    _moviesProvider.disposeStreams();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +32,7 @@ class MovieDetail extends StatelessWidget {
 
     return Scaffold(
       body: FutureBuilder(
-        future: moviesProvider.getDetailsMovie(movie),
+        future: _moviesProvider.getDetailsMovie(movie),
         builder: (BuildContext context, AsyncSnapshot<Movie> snapshot) {
           if (snapshot.hasData) {
             return CustomScrollView(
@@ -43,7 +60,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  // Scrollable AppBar
   Widget _crearAppBar(Movie movie) {
     return SliverAppBar(
       elevation: 2.0,
@@ -67,7 +83,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  //Poster - title - calification sections
   Widget _posterMovie(BuildContext context, Movie movie) {
     return Container(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
@@ -133,7 +148,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  // Movie genders
   Widget _genres(Movie movie) {
     return Padding(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 8.0),
@@ -141,7 +155,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  // Movie description section
   Widget _description(Movie movie, BuildContext context) {
     return Container(
       padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
@@ -156,7 +169,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  // Create actosrcasting section builder
   Widget _createCasting(Movie movie) {
     final actorProvider = ActorsProvider();
     return FutureBuilder(
@@ -176,7 +188,6 @@ class MovieDetail extends StatelessWidget {
     );
   }
 
-  // Create actor casting section
   Widget _createActorsPageView(List<Actor> actors, BuildContext context) {
     if (actors.isNotEmpty) {
       return Container(
@@ -189,14 +200,25 @@ class MovieDetail extends StatelessWidget {
                     left: 20.0, right: 20.0, top: 20.0, bottom: 8.0),
                 child: Text("Actores",
                     style: Theme.of(context).textTheme.headline6)),
-            SizedBox(
-              height: 180.0,
-              child: PageView.builder(
-                pageSnapping: false,
-                controller:
-                    PageController(initialPage: 1, viewportFraction: 0.3),
+            // SizedBox(
+            //   height: 180.0,
+            //   child: PageView.builder(
+            //     pageSnapping: false,
+            //     controller:
+            //         PageController(initialPage: 1, viewportFraction: 0.3),
+            //     itemCount: actors.length,
+            //     itemBuilder: (context, index) =>
+            //         _actorCard(actors[index], context),
+            //   ),
+            // ),
+            Container(
+              height: 190.0,
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: BouncingScrollPhysics(),
                 itemCount: actors.length,
-                itemBuilder: (context, index) =>
+                itemBuilder: (BuildContext context, int index) =>
                     _actorCard(actors[index], context),
               ),
             ),
@@ -208,7 +230,6 @@ class MovieDetail extends StatelessWidget {
     }
   }
 
-  // Create actor card
   Widget _actorCard(Actor actor, BuildContext context) {
     return Container(
       margin: EdgeInsets.only(right: 15.0),
@@ -216,6 +237,7 @@ class MovieDetail extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(15.0),
+            clipBehavior: Clip.antiAlias,
             child: FadeInImage(
               image: NetworkImage(actor.getPhoto(), scale: 1.0),
               placeholder: AssetImage("assets/img/no-image.jpg"),
@@ -226,10 +248,14 @@ class MovieDetail extends StatelessWidget {
             ),
           ),
           SizedBox(height: 5.0),
-          Text(
-            actor.name,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
+          SizedBox(
+            width: 100.0,
+            child: Text(
+              actor.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),
@@ -238,7 +264,7 @@ class MovieDetail extends StatelessWidget {
 
   Widget _createSimilar(Movie movie) {
     return FutureBuilder(
-      future: moviesProvider.getSimilar(movie),
+      future: _moviesProvider.getSimilar(movie),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Movie> similar = snapshot.data;

@@ -15,6 +15,7 @@ class GenrePageDetail extends StatefulWidget {
 class _GenrePageDetailState extends State<GenrePageDetail> {
   MoviesProvider _moviesProvider;
   ScrollController _scrollController;
+  int _crossCount = 3;
 
   @override
   void initState() {
@@ -32,6 +33,13 @@ class _GenrePageDetailState extends State<GenrePageDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final _dimen = MediaQuery.of(context).size;
+    if (_dimen.width >= 500 && _dimen.width <= 620)
+      _crossCount = 4;
+    else if (_dimen.width > 620) _crossCount = 5;
+
+    print("Height: ${_dimen.height} - Widht: ${_dimen.width}");
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -54,10 +62,12 @@ class _GenrePageDetailState extends State<GenrePageDetail> {
   Widget _genrePageDetailSection(List<Movie> movies) {
     return GridView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 5.0),
+      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 6.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: _crossCount,
         childAspectRatio: 0.6,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
       ),
       itemCount: movies.length,
       itemBuilder: (context, index) {

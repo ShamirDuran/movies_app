@@ -90,6 +90,7 @@ class DataSearch extends SearchDelegate {
         return ListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(6.0),
+            clipBehavior: Clip.antiAlias,
             child: FadeInImage(
               image: NetworkImage(movie.getPosterImg()),
               placeholder: AssetImage("assets/img/no-image.jpg"),

@@ -12,7 +12,7 @@ class MovieCard extends StatelessWidget {
   }
 
   Widget _movieCard(Movie movie, BuildContext context) {
-    final _card = Card(
+    final _card1 = Card(
       elevation: 0.0,
       child: Stack(
         children: [
@@ -62,9 +62,9 @@ class MovieCard extends StatelessWidget {
     );
 
     final _card2 = Container(
-      margin: EdgeInsets.symmetric(horizontal: 3.0, vertical: 3.0),
-      height: 220.0,
+      // margin: EdgeInsets.symmetric(horizontal: 3.0, vertical: 5.0),
       child: Stack(
+        fit: StackFit.expand,
         children: [
           Hero(
             tag: movie.uniqueId,
@@ -77,7 +77,6 @@ class MovieCard extends StatelessWidget {
                 placeholder: AssetImage("assets/img/no-image.jpg"),
                 fadeInDuration: Duration(microseconds: 1000),
                 fit: BoxFit.cover,
-                height: 220.0,
               ),
             ),
           ),

@@ -34,11 +34,20 @@ class _MovieGridState extends State<MovieGrid> {
 
   @override
   Widget build(BuildContext context) {
+    final _dimen = MediaQuery.of(context).size;
+    int _crossCount = 3;
+
+    if (_dimen.width >= 425 && _dimen.width <= 600)
+      _crossCount = 4;
+    else if (_dimen.width > 600) _crossCount = 5;
+
     return GridView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 5.0),
+      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 6.0),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+        crossAxisCount: _crossCount,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
         childAspectRatio: 0.6,
       ),
       itemCount: widget.movies.length,
